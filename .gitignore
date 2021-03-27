@@ -1,1 +1,8 @@
 .DS_Store
+.idea/
+.classpath
+.factorypath
+.project
+target/
+.settings/
+algafood-api.iml
