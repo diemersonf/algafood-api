@@ -63,16 +63,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleExceptionInternal(
             Exception ex, @Nullable Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        if (body == null){
+        if (body == null) {
             body = Problem.builder()
-                    .status(status.value())
                     .title(status.getReasonPhrase())
+                    .status(status.value())
                     .build();
-        } else if (body instanceof String){
+        } else if (body instanceof String) {
             body = Problem.builder()
+                    .title((String) body)
                     .status(status.value())
-                    .title(status.getReasonPhrase())
-                    .detail(ex.getMessage())
                     .build();
         }
 
