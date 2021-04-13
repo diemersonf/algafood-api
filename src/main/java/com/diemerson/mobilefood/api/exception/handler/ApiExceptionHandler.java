@@ -4,6 +4,11 @@ package com.diemerson.mobilefood.api.exception.handler;
 import com.diemerson.mobilefood.domain.exception.EntidadeEmUsoException;
 import com.diemerson.mobilefood.domain.exception.EntidadeNaoEncontradaException;
 import com.diemerson.mobilefood.domain.exception.NegocioException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.IgnoredPropertyException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.PropertyBindingException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +20,24 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.WebUtils;
 
+import java.lang.ref.Reference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                   HttpHeaders headers, HttpStatus status, WebRequest request) {
+        Throwable rootCause = ExceptionUtils.getRootCause(ex);
+
+        if(rootCause instanceof InvalidFormatException){
+            return handleInvalideFormatException((InvalidFormatException) rootCause, headers, status, request);
+        } else if (rootCause instanceof PropertyBindingException){
+            return handlePropertyBindingException(rootCause, headers, status, request);
+        }
 
         ProblemType problemType = ProblemType.REQUISICAO_INCORRETA;
         String detail = "Algo na requisição está incorreto. Verifique!";
@@ -28,6 +45,35 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 
+    }
+
+    private ResponseEntity<Object> handlePropertyBindingException(Throwable ex, HttpHeaders headers,
+                                                                  HttpStatus status, WebRequest request) {
+        String property = ((PropertyBindingException) ex).getPath().stream()
+                .map(ref -> ref.getFieldName())
+                .collect(Collectors.joining());
+
+        ProblemType problemType = ProblemType.REQUISICAO_INCORRETA;
+        String detail = String.format("A propriedade '%s' não é uma propriedade válida para a entidade restaurante. " +
+                        "Revise sua requisição!!! ", property);
+
+        Problem problem = createProblemBuilder(status, problemType, detail).build();
+        return handleExceptionInternal((PropertyBindingException) ex, problem, new HttpHeaders(), status, request);
+    }
+
+    private ResponseEntity<Object> handleInvalideFormatException(InvalidFormatException ex, HttpHeaders headers,
+                                                                 HttpStatus status, WebRequest request) {
+        String path = ex.getPath().stream()
+                .map(ref -> ref.getFieldName())
+                .collect(Collectors.joining("."));
+
+        ProblemType problemType = ProblemType.REQUISICAO_INCORRETA;
+        String detail = String.format("A propriedade '%s' recebeu o valor '%s', " +
+                "que é de um tipo inválido. Corriga e informe um valor compatível com o tipo '%s'", 
+                path, ex.getValue(), ex.getTargetType().getSimpleName());
+        Problem problem = createProblemBuilder(status, problemType, detail).build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
     }
 
     @ExceptionHandler(EntidadeNaoEncontradaException.class)
