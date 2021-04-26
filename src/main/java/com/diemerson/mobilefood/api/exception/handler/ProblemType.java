@@ -5,10 +5,11 @@ import lombok.Getter;
 @Getter
 public enum ProblemType {
 
-    REQUISICAO_INCORRETA("/requisicao-invalida", "Requisição Inválida"),
+    REQUISICAO_IVALIDA("/requisicao-invalida", "Requisição Inválida"),
     ENTIDADE_NAO_ENCONTRADA("/entidade-nao-encontrada", "Entidade não Encontrada"),
     ERRO_NEGOCIO("/erro-negocio", "Violacao Regra de Negócio"),
-    ENTIDADE_EM_USO("/entidade-em-uso", "Entidade em Uso");
+    ENTIDADE_EM_USO("/entidade-em-uso", "Entidade em Uso"),
+    PARAMETRO_INVALIDO("/parametro-invalido", "Parâmetro Inválido");
 
     private String title;
     private String uri;

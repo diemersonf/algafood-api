@@ -4,9 +4,8 @@ package com.diemerson.mobilefood.api.exception.handler;
 import com.diemerson.mobilefood.domain.exception.EntidadeEmUsoException;
 import com.diemerson.mobilefood.domain.exception.EntidadeNaoEncontradaException;
 import com.diemerson.mobilefood.domain.exception.NegocioException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.exc.IgnoredPropertyException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.fasterxml.jackson.databind.exc.PropertyBindingException;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.http.HttpHeaders;
@@ -17,12 +16,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.WebUtils;
 
-import java.lang.ref.Reference;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -32,28 +29,32 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
                                                                   HttpHeaders headers, HttpStatus status, WebRequest request) {
         Throwable rootCause = ExceptionUtils.getRootCause(ex);
+        ResponseEntity<Object> origimRootCase = validRootCause(headers, status, request, rootCause, ex);
+        return origimRootCase;
+    }
+
+    private ResponseEntity<Object> validRootCause(HttpHeaders headers, HttpStatus status, WebRequest request, Throwable rootCause, HttpMessageNotReadableException ex) {
+        ResponseEntity<Object> exception = null;
 
         if(rootCause instanceof InvalidFormatException){
-            return handleInvalideFormatException((InvalidFormatException) rootCause, headers, status, request);
+            exception = handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);
         } else if (rootCause instanceof PropertyBindingException){
-            return handlePropertyBindingException(rootCause, headers, status, request);
+            exception = handlePropertyBindingException(rootCause, headers, status, request);
+        } else {
+            ProblemType problemType = ProblemType.REQUISICAO_IVALIDA;
+            String detail = "Algo na requisição está incorreto. Verifique!";
+            Problem problem = createProblemBuilder(status, problemType, detail).build();
+
+            exception = handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
         }
-
-        ProblemType problemType = ProblemType.REQUISICAO_INCORRETA;
-        String detail = "Algo na requisição está incorreto. Verifique!";
-        Problem problem = createProblemBuilder(status, problemType, detail).build();
-
-        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
-
+        return exception;
     }
 
     private ResponseEntity<Object> handlePropertyBindingException(Throwable ex, HttpHeaders headers,
                                                                   HttpStatus status, WebRequest request) {
-        String property = ((PropertyBindingException) ex).getPath().stream()
-                .map(ref -> ref.getFieldName())
-                .collect(Collectors.joining());
+        String property = joinPath((MismatchedInputException) ex);
 
-        ProblemType problemType = ProblemType.REQUISICAO_INCORRETA;
+        ProblemType problemType = ProblemType.REQUISICAO_IVALIDA;
         String detail = String.format("A propriedade '%s' não é uma propriedade válida para a entidade restaurante. " +
                         "Revise sua requisição!!! ", property);
 
@@ -61,16 +62,27 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal((PropertyBindingException) ex, problem, new HttpHeaders(), status, request);
     }
 
-    private ResponseEntity<Object> handleInvalideFormatException(InvalidFormatException ex, HttpHeaders headers,
+    private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex, HttpHeaders headers,
                                                                  HttpStatus status, WebRequest request) {
-        String path = ex.getPath().stream()
-                .map(ref -> ref.getFieldName())
-                .collect(Collectors.joining("."));
+        String property = joinPath((MismatchedInputException) ex);
 
-        ProblemType problemType = ProblemType.REQUISICAO_INCORRETA;
+        ProblemType problemType = ProblemType.REQUISICAO_IVALIDA;
         String detail = String.format("A propriedade '%s' recebeu o valor '%s', " +
-                "que é de um tipo inválido. Corriga e informe um valor compatível com o tipo '%s'", 
-                path, ex.getValue(), ex.getTargetType().getSimpleName());
+                "que é de um tipo inválido. Corriga e informe um valor compatível com o tipo '%s'",
+                property, ex.getValue(), ex.getTargetType().getSimpleName());
+        Problem problem = createProblemBuilder(status, problemType, detail).build();
+
+        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, WebRequest request){
+
+        ProblemType problemType = ProblemType.PARAMETRO_INVALIDO;
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        String detail = String.format("O parâmetro de URL '%s' recebeu o valor '%s', que é de um tipo inválido. " +
+                        "Corrija e informe um valor compatível com o tipo %s.",
+                ex.getParameter().getParameterName(), ex.getValue(), ex.getRequiredType().getTypeName());
         Problem problem = createProblemBuilder(status, problemType, detail).build();
 
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
@@ -134,6 +146,12 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 .type(problemType.getUri())
                 .title(problemType.getTitle())
                 .detail(detail);
+    }
+
+    private String joinPath(MismatchedInputException ex) {
+        return ex.getPath().stream()
+                .map(ref -> ref.getFieldName())
+                .collect(Collectors.joining("."));
     }
 }
 
