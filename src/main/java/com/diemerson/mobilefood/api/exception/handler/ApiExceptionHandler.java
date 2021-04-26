@@ -33,23 +33,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return origimRootCase;
     }
 
-    private ResponseEntity<Object> validRootCause(HttpHeaders headers, HttpStatus status, WebRequest request, Throwable rootCause, HttpMessageNotReadableException ex) {
-        ResponseEntity<Object> exception = null;
-
-        if(rootCause instanceof InvalidFormatException){
-            exception = handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);
-        } else if (rootCause instanceof PropertyBindingException){
-            exception = handlePropertyBindingException(rootCause, headers, status, request);
-        } else {
-            ProblemType problemType = ProblemType.REQUISICAO_IVALIDA;
-            String detail = "Algo na requisição está incorreto. Verifique!";
-            Problem problem = createProblemBuilder(status, problemType, detail).build();
-
-            exception = handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
-        }
-        return exception;
-    }
-
     private ResponseEntity<Object> handlePropertyBindingException(Throwable ex, HttpHeaders headers,
                                                                   HttpStatus status, WebRequest request) {
         String property = joinPath((MismatchedInputException) ex);
@@ -152,6 +135,23 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return ex.getPath().stream()
                 .map(ref -> ref.getFieldName())
                 .collect(Collectors.joining("."));
+    }
+
+    private ResponseEntity<Object> validRootCause(HttpHeaders headers, HttpStatus status, WebRequest request, Throwable rootCause, HttpMessageNotReadableException ex) {
+        ResponseEntity<Object> exception = null;
+
+        if(rootCause instanceof InvalidFormatException){
+            exception = handleInvalidFormatException((InvalidFormatException) rootCause, headers, status, request);
+        } else if (rootCause instanceof PropertyBindingException){
+            exception = handlePropertyBindingException(rootCause, headers, status, request);
+        } else {
+            ProblemType problemType = ProblemType.REQUISICAO_IVALIDA;
+            String detail = "Algo na requisição está incorreto. Verifique!";
+            Problem problem = createProblemBuilder(status, problemType, detail).build();
+
+            exception = handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
+        }
+        return exception;
     }
 }
 
