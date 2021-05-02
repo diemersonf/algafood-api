@@ -85,17 +85,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
     }
 
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    public ResponseEntity<?> handleHibernateException(DataIntegrityViolationException ex, WebRequest request){
-//
-//        ProblemType problemType = ProblemType.REQUISICAO_IVALIDA;
-//        HttpStatus status = HttpStatus.BAD_REQUEST;
-//        String detail = String.format("Erro ao atualizar banco de dados, causa raiz: %s", ex.getRootCause().getMessage());
-//        Problem problem = createProblemBuilder(status, problemType, detail, MSG_ERRO_GENERICO_AO_USUARIO_FINAL).build();
-//
-//        return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
-//    }
-
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<?> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, WebRequest request){
 
