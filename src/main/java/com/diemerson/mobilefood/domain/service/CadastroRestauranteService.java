@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.diemerson.mobilefood.domain.model.Cozinha;
 import com.diemerson.mobilefood.domain.model.Restaurante;
 import com.diemerson.mobilefood.domain.repository.RestauranteRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroRestauranteService {
@@ -21,7 +22,8 @@ public class CadastroRestauranteService {
 	
 	@Autowired
 	private CadastroCozinhaService cadastroCozinha;
-	
+
+	@Transactional
 	public Restaurante salvar(Restaurante restaurante) {
 		Long cozinhaId = restaurante.getCozinha().getId();
 		
@@ -37,6 +39,7 @@ public class CadastroRestauranteService {
 			.orElseThrow(() -> new RestauranteNaoEncontradoException(restauranteId));
 	}
 
+	@Transactional
 	public void excluir(Long restauranteId) {
 		try {
 			restauranteRepository.deleteById(restauranteId);

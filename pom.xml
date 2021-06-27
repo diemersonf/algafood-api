@@ -8,11 +8,11 @@
     <version>2.1.7.RELEASE</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
-  
+
   <groupId>com.algaworks</groupId>
-  <artifactId>algafood-api</artifactId>
+  <artifactId>mobilefood-api</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>algafood-api</name>
+  <name>mobilefood-api</name>
   <description>API de delivery de comida</description>
 
   <properties>
@@ -61,6 +61,11 @@
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-lang3</artifactId>
       </dependency>
+    <dependency>
+      <groupId>io.rest-assured</groupId>
+      <artifactId>rest-assured</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -69,6 +74,19 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.22.2</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
     </plugins>
   </build>
 

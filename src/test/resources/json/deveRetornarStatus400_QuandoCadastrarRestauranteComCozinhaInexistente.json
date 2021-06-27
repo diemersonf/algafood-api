@@ -1,0 +1,7 @@
+{
+  "nome": "Vila do Salgado",
+  "taxaFrete": 2.5,
+  "cozinha": {
+    "id": 99999999
+  }
+}

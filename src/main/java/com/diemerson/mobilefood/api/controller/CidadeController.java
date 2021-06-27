@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.diemerson.mobilefood.domain.repository.CidadeRepository;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(value = "/cidades")
 public class CidadeController {
@@ -43,7 +45,7 @@ public class CidadeController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Cidade adicionar(@RequestBody Cidade cidade) {
+	public Cidade adicionar(@RequestBody @Valid Cidade cidade) {
 		try {
 			return cadastroCidade.salvar(cidade);
 		} catch (EstadoNaoEncontradoException e) {
@@ -53,7 +55,7 @@ public class CidadeController {
 	
 	@PutMapping("/{cidadeId}")
 	public Cidade atualizar(@PathVariable Long cidadeId,
-			@RequestBody Cidade cidade) {
+			@RequestBody @Valid Cidade cidade) {
 		try {
 			Cidade cidadeAtual = cadastroCidade.buscarOuFalhar(cidadeId);
 			
