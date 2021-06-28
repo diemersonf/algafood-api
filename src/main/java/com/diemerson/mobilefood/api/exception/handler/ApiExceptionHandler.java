@@ -28,7 +28,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.util.WebUtils;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -184,11 +184,13 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         if (body == null) {
             body = Problem.builder()
+                    .timestamp(OffsetDateTime.now())
                     .title(status.getReasonPhrase())
                     .status(status.value())
                     .build();
         } else if (body instanceof String) {
             body = Problem.builder()
+                    .timestamp(OffsetDateTime.now())
                     .title((String) body)
                     .status(status.value())
                     .build();
@@ -208,7 +210,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 .title(problemType.getTitle())
                 .detail(detail)
                 .userMessage(userMessage)
-                .timestamp(LocalDateTime.now());
+                .timestamp(OffsetDateTime.now());
     }
 
     private String joinPath(MismatchedInputException ex) {
