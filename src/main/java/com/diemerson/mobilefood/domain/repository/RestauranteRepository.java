@@ -30,5 +30,4 @@ public interface RestauranteRepository
 	List<Restaurante> findTop2ByNomeContaining(String nome);
 	
 	int countByCozinhaId(Long cozinha);
-	
 }

@@ -57,7 +57,7 @@ public class CadastroRestauranteT {
 
     @Test
     public void deveRetornarStatus201_QuandoCadastrarRestaurante(){
-        String json = ResourceUtils.getContentFromResource("/json/deveRetornarStatus201_QuandoCadastrarRestaurante.json");
+        String json = ResourceUtils.getContentFromResource("/json/RestauranteTests/deveRetornarStatus201_QuandoCadastrarRestaurante.json");
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -71,7 +71,7 @@ public class CadastroRestauranteT {
     @Test
     public void deveRetornarStatus201_QuandoCadastrarRestauranteComTaxaFreteZeroENomeConterFreteGratis(){
         String json = ResourceUtils.getContentFromResource(
-                "/json/deveRetornarStatus201_QuandoCadastrarRestauranteComTaxaFreteZeroENomeConterFreteGratis.json");
+                "/json/RestauranteTests/deveRetornarStatus201_QuandoCadastrarRestauranteComTaxaFreteZeroENomeConterFreteGratis.json");
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -84,7 +84,7 @@ public class CadastroRestauranteT {
 
     @Test
     public void deveRetornarStatus400_QuandoCadastrarRestauranteComCozinhaInexistente(){
-        String json = ResourceUtils.getContentFromResource("/json/deveRetornarStatus400_QuandoCadastrarRestauranteComCozinhaInexistente.json");
+        String json = ResourceUtils.getContentFromResource("/json/RestauranteTests/deveRetornarStatus400_QuandoCadastrarRestauranteComCozinhaInexistente.json");
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -114,7 +114,7 @@ public class CadastroRestauranteT {
     @Test
     public void deveRetornarStatus400ComMenssagemDeNomeComFreteGratis_QuandoCadastrarRestauranteComValorDaTaxaZero(){
         String json = ResourceUtils.getContentFromResource(
-                "/json/deveRetornarStatus400ComMenssagemDeNomeComFreteGratis_QuandoCadastrarRestauranteComValorDaTaxaZero.json");
+                "/json/RestauranteTests/deveRetornarStatus400ComMenssagemDeNomeComFreteGratis_QuandoCadastrarRestauranteComValorDaTaxaZero.json");
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -129,7 +129,7 @@ public class CadastroRestauranteT {
     @Test
     public void deveRetornarStatus400ComMenssagemDeNomeObrigatorio_QuandoCadastrarRestauranteSemInformarNome(){
         String json = ResourceUtils.getContentFromResource(
-                "/json/deveRetornarStatus400ComMenssagemDeNomeObrigatorio_QuandoCadastrarRestauranteSemInformarNome.json");
+                "/json/RestauranteTests/deveRetornarStatus400ComMenssagemDeNomeObrigatorio_QuandoCadastrarRestauranteSemInformarNome.json");
         given()
             .accept(ContentType.JSON)
             .contentType(ContentType.JSON)
@@ -150,7 +150,7 @@ public class CadastroRestauranteT {
             .get()
         .then()
             .statusCode(HttpStatus.OK.value())
-                .body("nome", equalTo(zeBanana.getNome()));
+            .body("nome", equalTo(zeBanana.getNome()));
     }
 
     private void prepararDados(){

@@ -33,19 +33,13 @@ public class Restaurante {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotBlank
 	@Column(nullable = false)
 	private String nome;
 
-	@PositiveOrZero
-	@NotNull
 	@Column(name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
 
 	@JsonIgnoreProperties(value = "nome", allowGetters = true)
-	@Valid
-	@ConvertGroup(from = Default.class, to = Groups.CozinhaId.class)
-	@NotNull
 	@ManyToOne
 	@JoinColumn(name = "cozinha_id", nullable = false)
 	private Cozinha cozinha;
@@ -54,12 +48,10 @@ public class Restaurante {
 	@Embedded
 	private Endereco endereco;
 	
-//	@JsonIgnore
 	@CreationTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
 	private OffsetDateTime dataCadastro;
 	
-//	@JsonIgnore
 	@UpdateTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
 	private OffsetDateTime dataAtualizacao;
@@ -74,5 +66,14 @@ public class Restaurante {
 	@JsonIgnore
 	@OneToMany(mappedBy = "restaurante")
 	private List<Produto> produtos = new ArrayList<>();
-	
+
+	private Boolean status = true;
+
+	public void ativar (){
+		setStatus(true);
+	}
+
+	public void desativar (){
+		setStatus(false);
+	}
 }

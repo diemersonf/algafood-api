@@ -1,0 +1,1 @@
+alter table restaurante add column status boolean not null default 1;

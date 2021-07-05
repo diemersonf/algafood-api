@@ -49,7 +49,7 @@ public class CadastroCozinhaT {
 
     @Test
     public void deveRetornarStatus201_QuandoCadastrarCozinha(){
-        String json = ResourceUtils.getContentFromResource("/json/cozinha-portuguesa.json");
+        String json = ResourceUtils.getContentFromResource("/json/RestauranteTests/cozinha-portuguesa.json");
         given()
             .body(json)
             .contentType(ContentType.JSON)

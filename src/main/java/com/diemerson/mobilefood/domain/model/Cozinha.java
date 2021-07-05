@@ -1,13 +1,11 @@
 package com.diemerson.mobilefood.domain.model;
 
-import com.diemerson.mobilefood.core.validation.Groups;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +14,7 @@ import java.util.List;
 @Entity
 public class Cozinha {
 
-	@NotNull(groups = Groups.CozinhaId.class)
+//	@NotNull(groups = Groups.CozinhaId.class)
 	@EqualsAndHashCode.Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
