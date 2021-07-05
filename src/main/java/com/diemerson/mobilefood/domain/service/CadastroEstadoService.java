@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.diemerson.mobilefood.domain.model.Estado;
 import com.diemerson.mobilefood.domain.repository.EstadoRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroEstadoService {
@@ -18,15 +19,17 @@ public class CadastroEstadoService {
 	
 	@Autowired
 	private EstadoRepository estadoRepository;
-	
+
+	@Transactional
 	public Estado salvar(Estado estado) {
 		return estadoRepository.save(estado);
 	}
-	
+
+	@Transactional
 	public void excluir(Long estadoId) {
 		try {
 			estadoRepository.deleteById(estadoId);
-			
+			estadoRepository.flush();
 		} catch (EmptyResultDataAccessException e) {
 			throw new EstadoNaoEncontradoException(estadoId);
 		

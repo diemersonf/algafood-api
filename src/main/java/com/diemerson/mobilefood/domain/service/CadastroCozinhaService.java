@@ -9,6 +9,7 @@ import com.diemerson.mobilefood.domain.exception.CozinhaNaoEncontradaException;
 import com.diemerson.mobilefood.domain.exception.EntidadeEmUsoException;
 import com.diemerson.mobilefood.domain.model.Cozinha;
 import com.diemerson.mobilefood.domain.repository.CozinhaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CadastroCozinhaService {
@@ -18,15 +19,17 @@ public class CadastroCozinhaService {
 
 	@Autowired
 	private CozinhaRepository cozinhaRepository;
-	
+
+	@Transactional
 	public Cozinha salvar(Cozinha cozinha) {
 		return cozinhaRepository.save(cozinha);
 	}
-	
+
+	@Transactional
 	public void excluir(Long cozinhaId) {
 		try {
 			cozinhaRepository.deleteById(cozinhaId);
-			
+			cozinhaRepository.flush();
 		} catch (EmptyResultDataAccessException e) {
 			throw new CozinhaNaoEncontradaException(cozinhaId);
 		

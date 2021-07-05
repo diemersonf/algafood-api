@@ -1,48 +1,46 @@
 package com.diemerson.mobilefood.domain.model;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
+import com.diemerson.mobilefood.core.validation.Groups;
+import com.diemerson.mobilefood.core.validation.ValorZeroIncluiDescricao;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
+@ValorZeroIncluiDescricao(valorField = "taxaFrete",
+	descricaoField = "nome", descricaoObrigatoria = "Frete Grátis")
 public class Restaurante {
 
 	@EqualsAndHashCode.Include
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Column(nullable = false)
 	private String nome;
-	
+
 	@Column(name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
-	
-//	@JsonIgnore
-	@ManyToOne //(fetch = FetchType.LAZY)
+
+	@JsonIgnoreProperties(value = "nome", allowGetters = true)
+	@ManyToOne
 	@JoinColumn(name = "cozinha_id", nullable = false)
 	private Cozinha cozinha;
 	
@@ -50,15 +48,13 @@ public class Restaurante {
 	@Embedded
 	private Endereco endereco;
 	
-	@JsonIgnore
 	@CreationTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
-	private LocalDateTime dataCadastro;
+	private OffsetDateTime dataCadastro;
 	
-	@JsonIgnore
 	@UpdateTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
-	private LocalDateTime dataAtualizacao;
+	private OffsetDateTime dataAtualizacao;
 	
 	@JsonIgnore
 	@ManyToMany
@@ -70,5 +66,14 @@ public class Restaurante {
 	@JsonIgnore
 	@OneToMany(mappedBy = "restaurante")
 	private List<Produto> produtos = new ArrayList<>();
-	
+
+	private Boolean status = true;
+
+	public void ativar (){
+		setStatus(true);
+	}
+
+	public void desativar (){
+		setStatus(false);
+	}
 }
