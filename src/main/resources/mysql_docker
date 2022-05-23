@@ -1,0 +1,14 @@
+criar pasta local para persistir dados
+	mkdir /var/lib/mysql -p
+
+dar permissão a pasta acima
+	sudo chmod 777 /var/lib/mysql
+
+criar container mariadb
+	docker run -d --name mariadb-server -p 3306:3306 -v /var/lib/mysql:/var/lib/mysql -e "MYSQL_ROOT_PASSWORD=root" mariadb
+
+iniciar container
+    docker start mariadb-server
+
+conectar no banco
+    mysql -h 127.0.0.1 -u root -p root
