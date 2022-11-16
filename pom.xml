@@ -19,7 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>12</java.version>
-    <jackson.version>2.12.3</jackson.version>
+    <jackson.version>2.12.7.1</jackson.version>
     <modelmapper.version>2.3.0</modelmapper.version>
   </properties>
 
